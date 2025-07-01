@@ -1,5 +1,5 @@
 import express from 'express';
-import upload from '../middleware/upload';
+import upload, { uploadToCloudinary } from '../middleware/cloudinaryUpload';
 import {
   getAllClients,
   getClientById,
@@ -17,10 +17,10 @@ router.get('/', getAllClients);
 router.get('/:id', getClientById);
 
 // POST /api/clients - Create new client (with image upload)
-router.post('/', upload.single('clientImage'), createClient);
+router.post('/', upload.single('clientImage'), uploadToCloudinary, createClient);
 
 // PUT /api/clients/:id - Update client (with optional image upload)
-router.put('/:id', upload.single('clientImage'), updateClient);
+router.put('/:id', upload.single('clientImage'), uploadToCloudinary, updateClient);
 
 // DELETE /api/clients/:id - Delete client
 router.delete('/:id', deleteClient);

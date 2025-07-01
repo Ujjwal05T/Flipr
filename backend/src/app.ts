@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
 import connectDB from "./config/database";
 
 // Import routes
@@ -24,15 +23,24 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
-  credentials: true
+  origin: [
+    process.env.FRONTEND_URL || "http://localhost:5173",
+    "https://flipr-frontend-3m2a2jozt-ujjwal05ts-projects.vercel.app",
+    "https://flipr-frontend-ujjwal05ts-projects.vercel.app",
+    /^https:\/\/flipr-frontend-.*\.vercel\.app$/,
+    "http://localhost:5173",
+    "http://localhost:5174"
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Add preflight OPTIONS handler
+app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Serve static files (uploaded images)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // API Routes
 app.use('/api/projects', projectRoutes);
@@ -99,8 +107,13 @@ app.use('*', (req: Request, res: Response) => {
     });
 });
 
-// Start the Express server
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-    console.log(`API Documentation: http://localhost:${port}/api`);
-});
+// Export the app for Vercel
+export default app;
+
+// Start the Express server (only in local development)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        console.log(`Server is running at http://localhost:${port}`);
+        console.log(`API Documentation: http://localhost:${port}/api`);
+    });
+}

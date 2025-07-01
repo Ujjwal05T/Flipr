@@ -111,3 +111,4 @@ logs
 # Database
 *.sqlite
 *.db
+.vercel
