@@ -7,7 +7,6 @@ import {
   TrendingUp, 
   Palette, 
   Megaphone,
-  Star,
   ArrowRight,
   Phone,
   Mail,
@@ -17,11 +16,62 @@ import {
   Linkedin
 } from 'lucide-react';
 
+// Import new components
+import ProjectsSection from '../components/ProjectsSection';
+import ClientsSection from '../components/ClientsSection';
+import SubscriptionComponent from '../components/Subscription';
+import { contactApi, type ContactForm } from '../services/apiService';
+
 function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Contact form state
+  const [contactFormData, setContactFormData] = useState<ContactForm>({
+    fullName: '',
+    email: '',
+    mobileNumber: '',
+    city: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState('');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleContactFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setContactFormData({
+      ...contactFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleContactFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const response = await contactApi.submit(contactFormData);
+      if (response.success) {
+        setSubmitStatus('success');
+        setStatusMessage('Thank you! Your message has been sent successfully.');
+        setContactFormData({
+          fullName: '',
+          email: '',
+          mobileNumber: '',
+          city: '',
+          message: ''
+        });
+      }
+    } catch (error: any) {
+      setSubmitStatus('error');
+      setStatusMessage(error.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,40 +145,86 @@ function LandingPage() {
             
             <div className="bg-blue-600 rounded-lg p-8 text-white">
               <h2 className="text-2xl font-bold mb-6">Get A Free Consultation</h2>
-              <form className="space-y-4">
+              <form onSubmit={handleContactFormSubmit} className="space-y-4">
                 <div>
                   <input 
                     type="text" 
+                    name="fullName"
+                    value={contactFormData.fullName}
+                    onChange={handleContactFormChange}
                     placeholder="FULL NAME" 
+                    required
                     className="w-full px-4 py-3 rounded-md bg-blue-700 text-white placeholder-blue-200 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   />
                 </div>
                 <div>
                   <input 
                     type="email" 
+                    name="email"
+                    value={contactFormData.email}
+                    onChange={handleContactFormChange}
                     placeholder="EMAIL ADDRESS" 
+                    required
                     className="w-full px-4 py-3 rounded-md bg-blue-700 text-white placeholder-blue-200 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   />
                 </div>
                 <div>
                   <input 
                     type="tel" 
+                    name="mobileNumber"
+                    value={contactFormData.mobileNumber}
+                    onChange={handleContactFormChange}
                     placeholder="PHONE" 
+                    required
+                    className="w-full px-4 py-3 rounded-md bg-blue-700 text-white placeholder-blue-200 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                </div>
+                <div>
+                  <input 
+                    type="text" 
+                    name="city"
+                    value={contactFormData.city}
+                    onChange={handleContactFormChange}
+                    placeholder="CITY" 
+                    required
                     className="w-full px-4 py-3 rounded-md bg-blue-700 text-white placeholder-blue-200 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   />
                 </div>
                 <div>
                   <textarea 
+                    name="message"
+                    value={contactFormData.message}
+                    onChange={handleContactFormChange}
                     placeholder="MESSAGE" 
                     rows={4}
                     className="w-full px-4 py-3 rounded-md bg-blue-700 text-white placeholder-blue-200 border border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
                   ></textarea>
                 </div>
+
+                {/* Status Message */}
+                {submitStatus !== 'idle' && (
+                  <div className={`p-3 rounded-md text-sm ${
+                    submitStatus === 'success' 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}>
+                    {statusMessage}
+                  </div>
+                )}
+
                 <button 
                   type="submit"
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md transition-colors"
+                  disabled={isSubmitting}
+                  className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-400 text-white font-semibold py-3 px-6 rounded-md transition-colors flex items-center justify-center"
                 >
-                  SEND MESSAGE
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      SENDING...
+                    </>
+                  ) : (
+                    'SEND MESSAGE'
+                  )}
                 </button>
               </form>
             </div>
@@ -273,160 +369,11 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* Our Projects */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Projects</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We break what our biggest core strategy was marketing, creating, and exceptional projects that will bring 
-              ongoing top dollar for the sake of Real Projects.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <img 
-                src="https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                alt="Consultation project"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Consultation</h3>
-                <p className="text-gray-600 text-sm mb-4">Expert advice for your projects</p>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                  LEARN MORE
-                </button>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <img 
-                src="https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                alt="Design project"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Design</h3>
-                <p className="text-gray-600 text-sm mb-4">Creative design solutions</p>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                  LEARN MORE
-                </button>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <img 
-                src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                alt="Marketing & Design"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Marketing & Design</h3>
-                <p className="text-gray-600 text-sm mb-4">Integrated marketing solutions</p>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                  LEARN MORE
-                </button>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <img 
-                src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                alt="Construction & Marketing"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Construction & Marketing</h3>
-                <p className="text-gray-600 text-sm mb-4">Complete project management</p>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                  LEARN MORE
-                </button>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <img 
-                src="https://images.pexels.com/photos/3184317/pexels-photo-3184317.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                alt="Consultation services"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Consultation</h3>
-                <p className="text-gray-600 text-sm mb-4">Professional guidance</p>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
-                  LEARN MORE
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Our Projects - Connected to Backend */}
+      <ProjectsSection />
 
-      {/* Happy Clients */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Happy Clients</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {[
-              {
-                name: "Mike Johnson",
-                role: "Property Developer",
-                image: "https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=200",
-                rating: 5,
-                text: "Their design approach transformed our development project completely."
-              },
-              {
-                name: "Sarah Wilson", 
-                role: "Real Estate Agent",
-                image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=200",
-                rating: 5,
-                text: "Professional marketing strategies that delivered real results."
-              },
-              {
-                name: "David Chen",
-                role: "Investment Manager", 
-                image: "https://images.pexels.com/photos/3184420/pexels-photo-3184420.jpeg?auto=compress&cs=tinysrgb&w=200",
-                rating: 5,
-                text: "ROI exceeded expectations thanks to their strategic consultation."
-              },
-              {
-                name: "Emily Davis",
-                role: "Construction Manager",
-                image: "https://images.pexels.com/photos/3184419/pexels-photo-3184419.jpeg?auto=compress&cs=tinysrgb&w=200", 
-                rating: 5,
-                text: "Seamless integration of design and construction management."
-              },
-              {
-                name: "Robert Taylor",
-                role: "Business Owner",
-                image: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=200",
-                rating: 5,
-                text: "Outstanding service from consultation through project completion."
-              }
-            ].map((client, index) => (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow text-center">
-                <img 
-                  src={client.image}
-                  alt={client.name}
-                  className="w-16 h-16 rounded-full mx-auto mb-4 object-cover"
-                />
-                <div className="flex justify-center mb-3">
-                  {[...Array(client.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-600 text-sm mb-4 italic">"{client.text}"</p>
-                <h4 className="font-semibold text-gray-900">{client.name}</h4>
-                <p className="text-gray-500 text-sm">{client.role}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Happy Clients - Connected to Backend */}
+      <ClientsSection />
 
       {/* Final CTA Section */}
       <section className="py-16 bg-gray-900 text-white">
@@ -439,6 +386,9 @@ function LandingPage() {
           </button>
         </div>
       </section>
+
+      {/* Newsletter Subscription - Connected to Backend */}
+      <SubscriptionComponent />
 
       {/* Footer */}
       <footer className="bg-blue-900 text-white py-12">
