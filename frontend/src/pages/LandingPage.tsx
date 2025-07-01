@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Menu, 
   X, 
@@ -13,7 +14,8 @@ import {
   Facebook,
   Twitter,
   Instagram,
-  Linkedin
+  Linkedin,
+  Settings
 } from 'lucide-react';
 
 // Import new components
@@ -93,9 +95,13 @@ function LandingPage() {
                 <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">SERVICES</a>
                 <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">RECENT PROJECTS</a>
                 <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">OUR REFERENCE</a>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md text-sm font-medium transition-colors">
-                  GET STARTED
-                </button>
+                <Link 
+                  to="/admin" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  ADMIN PANEL
+                </Link>
               </div>
             </div>
             
@@ -113,9 +119,13 @@ function LandingPage() {
                 <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600">SERVICES</a>
                 <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600">RECENT PROJECTS</a>
                 <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600">OUR REFERENCE</a>
-                <button className="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md text-base font-medium">
-                  GET STARTED
-                </button>
+                <Link 
+                  to="/admin" 
+                  className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-base font-medium inline-flex items-center justify-center"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  ADMIN PANEL
+                </Link>
               </div>
             </div>
           )}

@@ -66,7 +66,7 @@ export const projectApi = {
     const formData = new FormData();
     formData.append('name', projectData.name);
     formData.append('description', projectData.description);
-    formData.append('image', projectData.image);
+    formData.append('projectImage', projectData.image);
     
     return await api.post('/projects', formData, {
       headers: {
@@ -79,7 +79,7 @@ export const projectApi = {
     const formData = new FormData();
     if (projectData.name) formData.append('name', projectData.name);
     if (projectData.description) formData.append('description', projectData.description);
-    if (projectData.image) formData.append('image', projectData.image);
+    if (projectData.image) formData.append('projectImage', projectData.image);
     
     return await api.put(`/projects/${id}`, formData, {
       headers: {
@@ -108,7 +108,7 @@ export const clientApi = {
     formData.append('name', clientData.name);
     formData.append('description', clientData.description);
     formData.append('designation', clientData.designation);
-    formData.append('image', clientData.image);
+    formData.append('clientImage', clientData.image);
     
     return await api.post('/clients', formData, {
       headers: {
@@ -122,7 +122,7 @@ export const clientApi = {
     if (clientData.name) formData.append('name', clientData.name);
     if (clientData.description) formData.append('description', clientData.description);
     if (clientData.designation) formData.append('designation', clientData.designation);
-    if (clientData.image) formData.append('image', clientData.image);
+    if (clientData.image) formData.append('clientImage', clientData.image);
     
     return await api.put(`/clients/${id}`, formData, {
       headers: {
