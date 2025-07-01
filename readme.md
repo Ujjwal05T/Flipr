@@ -376,10 +376,5 @@ This project is licensed under the MIT License.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📞 Support
-
-For support, email your-email@example.com or open an issue on GitHub.
-
----
 
 Built with ❤️ by Ujjwal Tamrakar
